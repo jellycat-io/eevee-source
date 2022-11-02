@@ -1,4 +1,9 @@
-import { TokenType } from './TokenType.ts'
+// -----------------------------------------------------------
+// ---------------          LEXER          -------------------
+// ---  Responsible for producing tokens from the source   ---
+// -----------------------------------------------------------
+
+import { TokenType } from './token-type.ts'
 import { error } from './log.ts'
 
 export interface Token {
@@ -50,6 +55,8 @@ export class Lexer {
       this.tokenize()
     }
 
+    this.addToken(TokenType.EOF, 'EndofFile')
+
     return this.tokens
   }
 
@@ -64,11 +71,19 @@ export class Lexer {
         this.addToken(TokenType.RIGHT_PAREN)
         break
       case '+':
+        this.addToken(TokenType.PLUS)
+        break
       case '-':
+        this.addToken(TokenType.MINUS)
+        break
       case '*':
+        this.addToken(TokenType.STAR)
+        break
       case '/':
+        this.addToken(TokenType.SLASH)
+        break
       case '%':
-        this.addToken(TokenType.BINARY_OP)
+        this.addToken(TokenType.PERCENT)
         break
       case '=':
         this.addToken(TokenType.EQUAL)

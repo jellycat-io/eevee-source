@@ -1,3 +1,8 @@
+// -----------------------------------------------------------
+// --------------          AST TYPES        ------------------
+// ---     Defines the structure of our languages AST      ---
+// -----------------------------------------------------------
+
 export type NodeType =
   | 'Program'
   | 'NumericLiteral'
