@@ -1,55 +1,56 @@
-import { RuntimeVal, NumberVal, NullVal } from './values.ts'
+import { RuntimeVal, NumberVal, MK_NULL, MK_NUMBER } from './values.ts'
 import {
-  NullLiteral,
   NumericLiteral,
+  Identifier,
   Stmt,
   Program,
   BinaryExpr,
 } from '../frontend/ast.ts'
+import Environment from './environment.ts'
+import { RuntimeError } from '../utils/error.ts'
+import { error, runtimeError } from '../utils/log.ts'
 
-export function evaluate(astNode: Stmt): RuntimeVal {
+export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
   switch (astNode.kind) {
     case 'NumericLiteral':
-      return {
-        type: 'number',
-        value: (astNode as NumericLiteral).value,
-      } as NumberVal
-    case 'NullLiteral': {
-      return {
-        type: 'nil',
-        value: (astNode as NullLiteral).value,
-      } as NullVal
-    }
+      return MK_NUMBER((astNode as NumericLiteral).value)
+    case 'Identifier':
+      return eval_identifier(astNode as Identifier, env)
     case 'BinaryExpr':
-      return eval_binary_expr(astNode as BinaryExpr)
+      return eval_binary_expr(astNode as BinaryExpr, env)
     case 'Program':
-      return eval_program(astNode as Program)
+      return eval_program(astNode as Program, env)
     default:
       console.error('Not implemented yet', astNode)
       Deno.exit(1)
   }
 }
 
-function eval_program(program: Program): RuntimeVal {
-  let lastEvaluated: RuntimeVal = { type: 'nil', value: 'nil' } as NullVal
+function eval_program(program: Program, env: Environment): RuntimeVal {
+  let lastEvaluated: RuntimeVal = MK_NULL()
+  try {
+    for (const stmt of program.body) {
+      lastEvaluated = evaluate(stmt, env)
+    }
 
-  for (const stmt of program.body) {
-    lastEvaluated = evaluate(stmt)
+    return lastEvaluated
+  } catch (err) {
+    if (err instanceof RuntimeError) runtimeError(err.message)
+    else error('Unexpected error')
+    Deno.exit(1)
   }
-
-  return lastEvaluated
 }
 
-function eval_binary_expr(expr: BinaryExpr): RuntimeVal {
-  const lhs = evaluate(expr.lhs)
-  const rhs = evaluate(expr.rhs)
+function eval_binary_expr(expr: BinaryExpr, env: Environment): RuntimeVal {
+  const lhs = evaluate(expr.lhs, env)
+  const rhs = evaluate(expr.rhs, env)
 
   if (lhs.type === 'number' && rhs.type === 'number') {
     return eval_numeric_expr(lhs as NumberVal, rhs as NumberVal, expr.operator)
   }
 
   // One or both are null
-  return { type: 'nil', value: 'nil' } as NullVal
+  return MK_NULL()
 }
 
 function eval_numeric_expr(
@@ -68,4 +69,9 @@ function eval_numeric_expr(
   else res = lhs.value % rhs.value
 
   return { type: 'number', value: res }
+}
+
+function eval_identifier(expr: Identifier, env: Environment): RuntimeVal {
+  const val = env.lookupVar(expr.symbol)
+  return val
 }

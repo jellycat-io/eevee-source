@@ -6,7 +6,6 @@
 export type NodeType =
   | 'Program'
   | 'NumericLiteral'
-  | 'NullLiteral'
   | 'Identifier'
   | 'StringLiteral'
   | 'BooleanLiteral'
@@ -52,9 +51,4 @@ export interface StringLiteral extends Expr {
 export interface BooleanLiteral extends Expr {
   kind: 'BooleanLiteral'
   value: boolean
-}
-
-export interface NullLiteral extends Expr {
-  kind: 'NullLiteral'
-  value: 'nil'
 }

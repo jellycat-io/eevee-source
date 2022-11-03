@@ -21,20 +21,17 @@ export const KEYWORDS: Record<string, TokenType> = {
   do: TokenType.DO,
   else: TokenType.ELSE,
   end: TokenType.END,
-  false: TokenType.FALSE,
   for: TokenType.FOR,
   if: TokenType.IF,
   lambda: TokenType.LAMBDA,
   let: TokenType.LET,
   match: TokenType.MATCH,
-  nil: TokenType.NIL,
   or: TokenType.OR,
   print: TokenType.PRINT,
   return: TokenType.RETURN,
   self: TokenType.SELF,
   super: TokenType.SUPER,
   then: TokenType.THEN,
-  true: TokenType.TRUE,
   while: TokenType.WHILE,
 }
 
@@ -104,7 +101,7 @@ export class Lexer {
         if (this.isDigit(c)) this.number()
         else if (this.isAlphaNumeric(c)) this.identifier()
         else {
-          error(this.line, this.current, 'Unexpected character')
+          error(`(${this.line}:${this.current}) Unexpected character at ${c}.`)
           Deno.exit(1)
         }
         break
@@ -144,7 +141,7 @@ export class Lexer {
     }
 
     if (this.isEOF()) {
-      error(this.line, this.current, 'Unterminated string.')
+      error(`(${this.line}:${this.current}) Unterminated string.`)
       Deno.exit(1)
     }
 

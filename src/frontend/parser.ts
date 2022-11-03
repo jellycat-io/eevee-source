@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-empty-interface
 import {
   Stmt,
   Program,
@@ -6,30 +5,34 @@ import {
   BinaryExpr,
   NumericLiteral,
   Identifier,
-  NullLiteral,
 } from './ast.ts'
 import { Lexer, Token } from './lexer.ts'
 import { TokenType } from './token-type.ts'
-
-export interface ParseError extends Error {}
+import { ParseError } from '../utils/error.ts'
+import { error, parseError } from '../utils/log.ts'
 
 export class Parser {
   private tokens: Array<Token> = []
 
   public produceAst(sourceCode: string): Program {
     this.tokens = new Lexer(sourceCode).scan()
+    try {
+      const program: Program = {
+        kind: 'Program',
+        body: [],
+      }
 
-    const program: Program = {
-      kind: 'Program',
-      body: [],
+      while (this.not_eof()) {
+        // Parse until end of file
+        program.body.push(this.parse_stmt())
+      }
+
+      return program
+    } catch (err) {
+      if (err instanceof ParseError) parseError(err.message)
+      else error('Unexpected error')
+      Deno.exit(1)
     }
-
-    while (this.not_eof()) {
-      // Parse until end of file
-      program.body.push(this.parse_stmt())
-    }
-
-    return program
   }
 
   private parse_stmt(): Stmt {
@@ -96,10 +99,6 @@ export class Parser {
           kind: 'NumericLiteral',
           value: parseFloat(this.consume().literal),
         } as NumericLiteral
-      case TokenType.NIL: {
-        this.consume() // Advance past null keyword
-        return { kind: 'NullLiteral', value: 'nil' } as NullLiteral
-      }
       case TokenType.LEFT_PAREN: {
         this.consume() // Eat the opening paren
         const value = this.parse_expr()
@@ -107,8 +106,7 @@ export class Parser {
         return value
       }
       default:
-        console.error('Unexpected token at', this.at())
-        Deno.exit(1)
+        throw new ParseError(`Unexpected token at ${this.at().literal}`)
     }
   }
 
@@ -124,13 +122,9 @@ export class Parser {
   private expect(type: TokenType) {
     const prev = this.tokens.shift() as Token
     if (!prev || prev.type !== type) {
-      console.error(
-        'Parse Error:\nUnexpected token at',
-        prev,
-        ' - Expected: ',
-        type
+      throw new ParseError(
+        `Unexpected token at ${prev.literal} - Expected: ${type}`
       )
-      Deno.exit(1)
     }
 
     return prev
