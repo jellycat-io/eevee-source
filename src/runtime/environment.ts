@@ -1,5 +1,12 @@
-import { RuntimeVal } from './values.ts';
+import { MK_BOOL, MK_NULL, MK_NUMBER, RuntimeVal } from './values.ts';
 import { RuntimeError } from '../utils/error.ts';
+
+function setupScope(scope: Environment) {
+  scope.declareVar('true', MK_BOOL(true), true);
+  scope.declareVar('false', MK_BOOL(false), true);
+  scope.declareVar('nil', MK_NULL(), true);
+  scope.declareVar('PI', MK_NUMBER(3.14159), true);
+}
 
 export default class Environment {
   private parent?: Environment;
@@ -7,9 +14,12 @@ export default class Environment {
   private constants: Set<string>;
 
   constructor(parentEnv?: Environment) {
+    const global = !parentEnv ? true : false;
     this.parent = parentEnv;
     this.variables = new Map();
     this.constants = new Set();
+
+    if (global) setupScope(this);
   }
 
   public declareVar(

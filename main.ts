@@ -1,16 +1,21 @@
 import { Parser } from './src/frontend/parser.ts'
 import Environment from './src/runtime/environment.ts'
 import { evaluate } from './src/runtime/interpreter.ts'
-import { MK_NULL, MK_BOOL, MK_NUMBER } from './src/runtime/values.ts'
 import { greet } from './src/utils/log.ts'
+
+async function run(filename: string) {
+  const parser = new Parser()
+  const env = new Environment()
+
+  const input = await Deno.readTextFile(filename)
+  const program = parser.produceAst(input)
+  const res = evaluate(program, env)
+  console.log(res)
+}
 
 function repl() {
   const parser = new Parser()
   const env = new Environment()
-  env.declareVar('true', MK_BOOL(true), true)
-  env.declareVar('false', MK_BOOL(false), true)
-  env.declareVar('nil', MK_NULL(), true)
-  env.declareVar('PI', MK_NUMBER(3.14159), true)
 
   greet('Eevee Repl v0.1')
 
@@ -27,4 +32,4 @@ function repl() {
   }
 }
 
-repl()
+run('test.eve')
