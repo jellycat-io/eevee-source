@@ -1,32 +1,32 @@
-export type ValueType = 'nil' | 'number' | 'boolean'
+export type ValueType = 'nil' | 'number' | 'boolean';
 
 export interface RuntimeVal {
-  type: ValueType
+  type: ValueType;
 }
 
 export interface NullVal extends RuntimeVal {
-  type: 'nil'
-  value: null
+  type: 'nil';
+  value: null;
 }
 
 export interface NumberVal extends RuntimeVal {
-  type: 'number'
-  value: number
+  type: 'number';
+  value: number;
 }
 
 export interface BooleanVal extends RuntimeVal {
-  type: 'boolean'
-  value: boolean
+  type: 'boolean';
+  value: boolean;
 }
 
 export function MK_NUMBER(n = 0) {
-  return { type: 'number', value: n } as NumberVal
+  return { type: 'number', value: n } as NumberVal;
 }
 
 export function MK_BOOL(b = true) {
-  return { type: 'boolean', value: b } as BooleanVal
+  return { type: 'boolean', value: b } as BooleanVal;
 }
 
 export function MK_NULL() {
-  return { type: 'nil', value: null } as NullVal
+  return { type: 'nil', value: null } as NullVal;
 }

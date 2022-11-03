@@ -15,50 +15,50 @@ export type NodeType =
   | 'UnaryExpr'
   | 'PostfixExpr'
   | 'BinaryExpr'
-  | 'FunctionDecl'
+  | 'FunctionDecl';
 
 export interface Stmt {
-  kind: NodeType
+  kind: NodeType;
 }
 
 export interface Program extends Stmt {
-  kind: 'Program'
-  body: Array<Stmt>
+  kind: 'Program';
+  body: Array<Stmt>;
 }
 
 export interface VarDeclaration extends Stmt {
-  kind: 'VarDeclaration'
-  constant: boolean
-  identifier: string
-  value: Expr | null
+  kind: 'VarDeclaration';
+  constant: boolean;
+  identifier: string;
+  value: Expr | null;
 }
 
 // deno-lint-ignore no-empty-interface
 export interface Expr extends Stmt {}
 
 export interface BinaryExpr extends Expr {
-  kind: 'BinaryExpr'
-  operator: string
-  lhs: Expr
-  rhs: Expr
+  kind: 'BinaryExpr';
+  operator: string;
+  lhs: Expr;
+  rhs: Expr;
 }
 
 export interface Identifier extends Expr {
-  kind: 'Identifier'
-  symbol: string
+  kind: 'Identifier';
+  symbol: string;
 }
 
 export interface NumericLiteral extends Expr {
-  kind: 'NumericLiteral'
-  value: number
+  kind: 'NumericLiteral';
+  value: number;
 }
 
 export interface StringLiteral extends Expr {
-  kind: 'StringLiteral'
-  value: string
+  kind: 'StringLiteral';
+  value: string;
 }
 
 export interface BooleanLiteral extends Expr {
-  kind: 'BooleanLiteral'
-  value: boolean
+  kind: 'BooleanLiteral';
+  value: boolean;
 }
