@@ -7,10 +7,10 @@ import { greet } from './src/utils/log.ts'
 function repl() {
   const parser = new Parser()
   const env = new Environment()
-  env.declareVar('true', MK_BOOL(true))
-  env.declareVar('false', MK_BOOL(false))
-  env.declareVar('nil', MK_NULL())
-  env.declareVar('PI', MK_NUMBER(3.14))
+  env.declareVar('true', MK_BOOL(true), true)
+  env.declareVar('false', MK_BOOL(false), true)
+  env.declareVar('nil', MK_NULL(), true)
+  env.declareVar('PI', MK_NUMBER(3.14159), true)
 
   greet('Eevee Repl v0.1')
 

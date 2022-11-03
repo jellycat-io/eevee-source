@@ -23,7 +23,6 @@
     "options": {
       "indentWidth": 2,
       "singleQuote": false,
-      "semi": true
     }
   }
 }
