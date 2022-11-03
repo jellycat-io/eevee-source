@@ -5,7 +5,9 @@
   "lint": {
     "files": {
       "include": [
-        "src/"
+        "src/",
+        "test/",
+        "util/"
       ]
     },
     "rules": {
@@ -17,7 +19,9 @@
   "fmt": {
     "files": {
       "include": [
-        "src/"
+        "src/",
+        "test/",
+        "util/"
       ]
     },
     "options": {
