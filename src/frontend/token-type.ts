@@ -43,6 +43,7 @@ export enum TokenType {
   AND,
   BREAK,
   CLASS,
+  CONST,
   DEF,
   DO,
   ELSE,

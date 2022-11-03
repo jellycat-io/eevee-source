@@ -5,11 +5,12 @@ import {
   BinaryExpr,
   NumericLiteral,
   Identifier,
+  VarDeclaration,
 } from './ast.ts'
 import { Lexer, Token } from './lexer.ts'
 import { TokenType } from './token-type.ts'
 import { ParseError } from '../utils/error.ts'
-import { error, parseError } from '../utils/log.ts'
+import { error } from '../utils/log.ts'
 
 export class Parser {
   private tokens: Array<Token> = []
@@ -29,15 +30,56 @@ export class Parser {
 
       return program
     } catch (err) {
-      if (err instanceof ParseError) parseError(err.message)
-      else error('Unexpected error')
+      if (err instanceof ParseError) error(err.getErrorMessage())
+      else error('Unexpected Parse Error')
       Deno.exit(1)
     }
   }
 
   private parse_stmt(): Stmt {
-    // skip to parse_expr
-    return this.parse_expr()
+    switch (this.at().type) {
+      case TokenType.LET:
+      case TokenType.CONST:
+        return this.parse_var_declaration()
+      default:
+        return this.parse_expr()
+    }
+  }
+
+  private parse_var_declaration(): Stmt {
+    const isConstant = this.consume().type == TokenType.CONST
+    const identifier = this.expect(
+      TokenType.IDENTIFIER,
+      'Expected identifier after variable declaration.'
+    ).literal
+
+    if (this.match(TokenType.SEMICOLON)) {
+      if (isConstant) {
+        throw new ParseError(
+          this.at(),
+          'Must assign value to constant expression.'
+        )
+      }
+
+      return {
+        kind: 'VarDeclaration',
+        identifier,
+        constant: false,
+        value: null,
+      } as VarDeclaration
+    }
+
+    this.expect(TokenType.EQUAL, "Expected '=' after identifier.")
+
+    const declaration = {
+      kind: 'VarDeclaration',
+      identifier,
+      value: this.parse_expr(),
+      constant: isConstant,
+    } as VarDeclaration
+
+    this.expect(TokenType.SEMICOLON, 'Missing semicolon.')
+    return declaration
   }
 
   private parse_expr(): Expr {
@@ -60,7 +102,6 @@ export class Parser {
         operator,
       } as BinaryExpr
     }
-
     return expr
   }
 
@@ -102,11 +143,14 @@ export class Parser {
       case TokenType.LEFT_PAREN: {
         this.consume() // Eat the opening paren
         const value = this.parse_expr()
-        this.expect(TokenType.RIGHT_PAREN)
+        this.expect(TokenType.RIGHT_PAREN, "Expected ')' after expression.")
         return value
       }
       default:
-        throw new ParseError(`Unexpected token at ${this.at().literal}`)
+        throw new ParseError(
+          this.at(),
+          `Unexpected token at ${this.at().literal}`
+        )
     }
   }
 
@@ -115,22 +159,34 @@ export class Parser {
   }
 
   private consume(): Token {
-    const prev = this.tokens.shift() as Token
-    return prev
+    return this.tokens.shift() as Token
   }
 
-  private expect(type: TokenType) {
-    const prev = this.tokens.shift() as Token
+  private check(type: TokenType): boolean {
+    if (!this.not_eof()) return false
+    return this.at().type == type
+  }
+
+  private match(...types: Array<TokenType>): boolean {
+    for (let i = 0; i < types.length; i++) {
+      if (this.check(types[i])) {
+        this.consume()
+        return true
+      }
+    }
+    return false
+  }
+
+  private expect(type: TokenType, message: string) {
+    const prev = this.consume()
     if (!prev || prev.type !== type) {
-      throw new ParseError(
-        `Unexpected token at ${prev.literal} - Expected: ${type}`
-      )
+      throw new ParseError(prev, message)
     }
 
     return prev
   }
 
   private not_eof(): boolean {
-    return this.tokens[0].type != TokenType.EOF
+    return this.at().type != TokenType.EOF
   }
 }

@@ -4,7 +4,10 @@
 // -----------------------------------------------------------
 
 export type NodeType =
+  // STATEMENTS
   | 'Program'
+  | 'VarDeclaration'
+  // EXPRESSIONS
   | 'NumericLiteral'
   | 'Identifier'
   | 'StringLiteral'
@@ -21,6 +24,13 @@ export interface Stmt {
 export interface Program extends Stmt {
   kind: 'Program'
   body: Array<Stmt>
+}
+
+export interface VarDeclaration extends Stmt {
+  kind: 'VarDeclaration'
+  constant: boolean
+  identifier: string
+  value: Expr | null
 }
 
 // deno-lint-ignore no-empty-interface

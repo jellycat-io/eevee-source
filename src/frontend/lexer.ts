@@ -5,6 +5,7 @@
 
 import { TokenType } from './token-type.ts'
 import { error } from '../utils/log.ts'
+import { LexerError } from '../utils/error.ts'
 
 export interface Token {
   type: TokenType
@@ -25,6 +26,7 @@ export const KEYWORDS: Record<string, TokenType> = {
   if: TokenType.IF,
   lambda: TokenType.LAMBDA,
   let: TokenType.LET,
+  const: TokenType.CONST,
   match: TokenType.MATCH,
   or: TokenType.OR,
   print: TokenType.PRINT,
@@ -47,20 +49,29 @@ export class Lexer {
   }
 
   scan(): Array<Token> {
-    while (!this.isEOF()) {
-      this.start = this.current
-      this.tokenize()
+    try {
+      while (!this.isEOF()) {
+        this.start = this.current
+        this.tokenize()
+      }
+
+      this.addToken(TokenType.EOF, 'EndofFile')
+
+      return this.tokens
+    } catch (err) {
+      if (err instanceof LexerError) error(err.getErrorMessage())
+      error('Unexpected Lexer Eerror')
+      Deno.exit(1)
     }
-
-    this.addToken(TokenType.EOF, 'EndofFile')
-
-    return this.tokens
   }
 
   tokenize() {
     const c = this.advance()
 
     switch (c) {
+      case ';':
+        this.addToken(TokenType.SEMICOLON)
+        break
       case '(':
         this.addToken(TokenType.LEFT_PAREN)
         break
@@ -101,8 +112,11 @@ export class Lexer {
         if (this.isDigit(c)) this.number()
         else if (this.isAlphaNumeric(c)) this.identifier()
         else {
-          error(`(${this.line}:${this.current}) Unexpected character at ${c}.`)
-          Deno.exit(1)
+          throw new LexerError(
+            this.line,
+            this.current,
+            `Unexpected character at ${c}.`
+          )
         }
         break
     }
@@ -141,8 +155,7 @@ export class Lexer {
     }
 
     if (this.isEOF()) {
-      error(`(${this.line}:${this.current}) Unterminated string.`)
-      Deno.exit(1)
+      throw new LexerError(this.line, this.current, 'Unterminated string.')
     }
 
     // The closing "'
