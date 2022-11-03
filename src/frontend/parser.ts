@@ -1,4 +1,5 @@
 import {
+  AssignmentExpr,
   BinaryExpr,
   Expr,
   Identifier,
@@ -83,7 +84,23 @@ export class Parser {
   }
 
   private parse_expr(): Expr {
-    return this.parse_term_expr();
+    return this.parse_assignment_expr();
+  }
+
+  private parse_assignment_expr(): Expr {
+    const expr = this.parse_term_expr();
+
+    if (this.match(TokenType.EQUAL)) {
+      const value = this.parse_assignment_expr();
+      this.expect(TokenType.SEMICOLON, 'Missing semicolon.');
+      return {
+        kind: 'AssignmentExpr',
+        assignee: expr,
+        value,
+      } as AssignmentExpr;
+    }
+
+    return expr;
   }
 
   private parse_term_expr(): Expr {

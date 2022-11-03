@@ -1,7 +1,21 @@
-import { BinaryExpr, Identifier } from '../../frontend/ast.ts';
+import { AssignmentExpr, BinaryExpr, Identifier } from '../../frontend/ast.ts';
 import Environment from '../environment.ts';
 import { MK_NULL, NumberVal, RuntimeVal } from '../values.ts';
 import { evaluate } from '../interpreter.ts';
+import { RuntimeError } from '../../utils/error.ts';
+
+export function eval_assignment_expr(
+  expr: AssignmentExpr,
+  env: Environment,
+): RuntimeVal {
+  if (expr.assignee.kind !== 'Identifier') {
+    throw new RuntimeError(
+      `Invalid identifier ${JSON.stringify(expr.assignee)}`,
+    );
+  }
+  const varname = (expr.assignee as Identifier).symbol;
+  return env.assignVar(varname, evaluate(expr.value, env));
+}
 
 export function eval_binary_expr(
   expr: BinaryExpr,

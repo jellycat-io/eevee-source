@@ -12,6 +12,7 @@ export type NodeType =
   | 'Identifier'
   | 'StringLiteral'
   | 'BooleanLiteral'
+  | 'AssignmentExpr'
   | 'UnaryExpr'
   | 'PostfixExpr'
   | 'BinaryExpr'
@@ -35,6 +36,12 @@ export interface VarDeclaration extends Stmt {
 
 // deno-lint-ignore no-empty-interface
 export interface Expr extends Stmt {}
+
+export interface AssignmentExpr extends Expr {
+  kind: 'AssignmentExpr';
+  assignee: Expr;
+  value: Expr;
+}
 
 export interface BinaryExpr extends Expr {
   kind: 'BinaryExpr';

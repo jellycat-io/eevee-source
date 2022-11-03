@@ -29,3 +29,31 @@ Deno.test('const declaration without assignment', () => {
   const input = 'const x;';
   assertThrows(() => compileSource(input, env), Error);
 });
+
+Deno.test('const assignment', () => {
+  const env = new Environment();
+  const input = `
+    const x = 2;
+    x = 5;
+  `;
+  assertThrows(() => compileSource(input, env), Error);
+});
+
+Deno.test('let assignment', () => {
+  const env = new Environment();
+  const input = `
+    let x = 2;
+    x = 5;
+  `;
+  assertEquals((compileSource(input, env) as NumberVal).value, 5);
+});
+
+Deno.test('let assignment with another variable', () => {
+  const env = new Environment();
+  const input = `
+    let x = 2;
+    let y = 3;
+    x = y;
+  `;
+  assertEquals((compileSource(input, env) as NumberVal).value, 3);
+});
