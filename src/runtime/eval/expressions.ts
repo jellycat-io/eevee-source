@@ -1,6 +1,11 @@
-import { AssignmentExpr, BinaryExpr, Identifier } from '../../frontend/ast.ts';
+import {
+  AssignmentExpr,
+  BinaryExpr,
+  Identifier,
+  PostfixExpr,
+} from '../../frontend/ast.ts';
 import Environment from '../environment.ts';
-import { MK_NULL, NumberVal, RuntimeVal } from '../values.ts';
+import { MK_NULL, MK_NUMBER, NumberVal, RuntimeVal } from '../values.ts';
 import { evaluate } from '../interpreter.ts';
 import { RuntimeError } from '../../utils/error.ts';
 
@@ -29,6 +34,37 @@ export function eval_binary_expr(
   }
 
   // One or both are null
+  return MK_NULL();
+}
+
+export function eval_postfix_expr(
+  expr: PostfixExpr,
+  env: Environment,
+): RuntimeVal {
+  let identifier = null;
+
+  if (expr.lhs.kind === 'Identifier') {
+    identifier = expr.lhs as Identifier;
+  }
+
+  const lhs = evaluate(expr.lhs, env);
+  if (lhs.type !== 'number') {
+    throw new RuntimeError(`Not a number ${JSON.stringify(lhs)}`);
+  }
+
+  if (expr.operator === '++') {
+    if (identifier) {
+      env.assignVar(identifier.symbol, MK_NUMBER((lhs as NumberVal).value + 1));
+    }
+    return MK_NUMBER((lhs as NumberVal).value + 1);
+  }
+  if (expr.operator === '--') {
+    if (identifier) {
+      env.assignVar(identifier.symbol, MK_NUMBER((lhs as NumberVal).value - 1));
+    }
+    return MK_NUMBER((lhs as NumberVal).value - 1);
+  }
+
   return MK_NULL();
 }
 

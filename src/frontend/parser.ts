@@ -4,6 +4,7 @@ import {
   Expr,
   Identifier,
   NumericLiteral,
+  PostfixExpr,
   Program,
   Stmt,
   VarDeclaration,
@@ -107,8 +108,10 @@ export class Parser {
     let expr = this.parse_factor_expr();
 
     while (
-      this.at().type == TokenType.PLUS ||
-      this.at().type == TokenType.MINUS
+      this.check(TokenType.PLUS) ||
+      this.check(TokenType.MINUS) ||
+      this.check(TokenType.PLUS_EQUAL) ||
+      this.check(TokenType.MINUS_EQUAL)
     ) {
       const operator = this.consume().literal;
       const rhs = this.parse_factor_expr();
@@ -123,21 +126,31 @@ export class Parser {
   }
 
   private parse_factor_expr(): Expr {
-    let expr = this.parse_primary_expr();
+    let expr = this.parse_postfix_expr();
 
     while (
-      this.at().type == TokenType.STAR ||
-      this.at().type == TokenType.SLASH ||
-      this.at().type == TokenType.PERCENT
+      this.check(TokenType.STAR) ||
+      this.check(TokenType.SLASH) ||
+      this.check(TokenType.PERCENT)
     ) {
       const operator = this.consume().literal;
-      const rhs = this.parse_primary_expr();
+      const rhs = this.parse_postfix_expr();
       expr = {
         kind: 'BinaryExpr',
         lhs: expr,
         rhs,
         operator,
       } as BinaryExpr;
+    }
+
+    return expr;
+  }
+
+  private parse_postfix_expr(): Expr {
+    let expr = this.parse_primary_expr();
+    if (this.check(TokenType.PLUS_PLUS) || this.check(TokenType.MINUS_MINUS)) {
+      const operator = this.consume().literal;
+      expr = { kind: 'PostfixExpr', operator, lhs: expr } as PostfixExpr;
     }
 
     return expr;

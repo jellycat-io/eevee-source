@@ -43,6 +43,12 @@ export interface AssignmentExpr extends Expr {
   value: Expr;
 }
 
+export interface PostfixExpr extends Expr {
+  kind: 'PostfixExpr';
+  operator: string;
+  lhs: Expr;
+}
+
 export interface BinaryExpr extends Expr {
   kind: 'BinaryExpr';
   operator: string;

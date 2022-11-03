@@ -79,16 +79,22 @@ export class Lexer {
         this.addToken(TokenType.RIGHT_PAREN);
         break;
       case '+':
-        this.addToken(TokenType.PLUS);
+        if (this.match('+')) this.addToken(TokenType.PLUS_PLUS);
+        else if (this.match('=')) this.addToken(TokenType.PLUS_EQUAL);
+        else this.addToken(TokenType.PLUS);
         break;
       case '-':
-        this.addToken(TokenType.MINUS);
+        if (this.match('-')) this.addToken(TokenType.MINUS_MINUS);
+        else if (this.match('=')) this.addToken(TokenType.MINUS_EQUAL);
+        else this.addToken(TokenType.MINUS);
         break;
       case '*':
-        this.addToken(TokenType.STAR);
+        if (this.match('=')) this.addToken(TokenType.STAR_EQUAL);
+        else this.addToken(TokenType.STAR);
         break;
       case '/':
-        this.addToken(TokenType.SLASH);
+        if (this.match('=')) this.addToken(TokenType.SLASH_EQUAL);
+        else this.addToken(TokenType.SLASH);
         break;
       case '%':
         this.addToken(TokenType.PERCENT);
@@ -182,13 +188,13 @@ export class Lexer {
     return this.source.charAt(this.current++);
   }
 
-  // private match(expected: string) {
-  //   if (!this.isEOF()) return false
-  //   if (this.source.charAt(this.current) !== expected) return false
-  //
-  //   this.current++
-  //   return true
-  // }
+  private match(expected: string) {
+    if (this.isEOF()) return false;
+    if (this.source.charAt(this.current) !== expected) return false;
+
+    this.current++;
+    return true;
+  }
 
   private peek() {
     if (this.isEOF()) return '\0';

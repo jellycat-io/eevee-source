@@ -4,6 +4,7 @@ import {
   BinaryExpr,
   Identifier,
   NumericLiteral,
+  PostfixExpr,
   Program,
   Stmt,
   VarDeclaration,
@@ -13,6 +14,7 @@ import {
   eval_assignment_expr,
   eval_binary_expr,
   eval_identifier,
+  eval_postfix_expr,
 } from './eval/expressions.ts';
 import { eval_program, eval_var_declaration } from './eval/statements.ts';
 import { RuntimeError } from '../utils/error.ts';
@@ -28,6 +30,8 @@ export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
       return eval_binary_expr(astNode as BinaryExpr, env);
     case 'AssignmentExpr':
       return eval_assignment_expr(astNode as AssignmentExpr, env);
+    case 'PostfixExpr':
+      return eval_postfix_expr(astNode as PostfixExpr, env);
 
     // STATEMENTS
     case 'Program':
