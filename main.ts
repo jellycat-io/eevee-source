@@ -1,5 +1,6 @@
-import { Parser } from './src/parser.ts'
-import { greet, log } from './src/log.ts'
+import { Parser } from './src/frontend/parser.ts'
+import { evaluate } from './src/runtime/interpreter.ts'
+import { greet } from './src/utils/log.ts'
 
 function repl() {
   const parser = new Parser()
@@ -14,7 +15,8 @@ function repl() {
     }
 
     const program = parser.produceAst(input)
-    console.log(program)
+    const res = evaluate(program)
+    console.log(res)
   }
 }
 

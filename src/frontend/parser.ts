@@ -6,6 +6,7 @@ import {
   BinaryExpr,
   NumericLiteral,
   Identifier,
+  NullLiteral,
 } from './ast.ts'
 import { Lexer, Token } from './lexer.ts'
 import { TokenType } from './token-type.ts'
@@ -95,6 +96,10 @@ export class Parser {
           kind: 'NumericLiteral',
           value: parseFloat(this.consume().literal),
         } as NumericLiteral
+      case TokenType.NIL: {
+        this.consume() // Advance past null keyword
+        return { kind: 'NullLiteral', value: 'nil' } as NullLiteral
+      }
       case TokenType.LEFT_PAREN: {
         this.consume() // Eat the opening paren
         const value = this.parse_expr()

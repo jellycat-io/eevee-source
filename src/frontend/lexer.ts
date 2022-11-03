@@ -4,7 +4,7 @@
 // -----------------------------------------------------------
 
 import { TokenType } from './token-type.ts'
-import { error } from './log.ts'
+import { error } from '../utils/log.ts'
 
 export interface Token {
   type: TokenType
@@ -163,7 +163,9 @@ export class Lexer {
 
     const text = this.source.substring(this.start, this.current)
     const reserved = KEYWORDS[text]
-    this.addToken(reserved ? reserved : TokenType.IDENTIFIER)
+    this.addToken(
+      typeof reserved === 'number' ? reserved : TokenType.IDENTIFIER
+    )
   }
 
   private advance() {
