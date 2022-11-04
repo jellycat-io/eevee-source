@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true
+  },
+  "lint": {
+    "files": {
+      "include": ["src/", "test/", "util/"]
+    },
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "include": ["src/", "test/", "util/"]
+    },
+    "options": {
+      "indentWidth": 2,
+      "singleQuote": true
+    }
+  }
+}
