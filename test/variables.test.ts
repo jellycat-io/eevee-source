@@ -2,30 +2,30 @@ import {
   assertEquals,
   assertThrows,
 } from 'https://deno.land/std@0.161.0/testing/asserts.ts';
-import Environment from '../src/runtime/environment.ts';
+import Environment, { createGlobalEnv } from '../src/runtime/environment.ts';
 import { NullVal, NumberVal } from '../src/runtime/values.ts';
 import { compileSource } from '../util/test-util.ts';
 
-const env = new Environment();
+const global = createGlobalEnv();
 
 Deno.test('let declaration without assignment', () => {
   const input = 'let foo;';
-  assertEquals((compileSource(input, env) as NullVal).value, null);
+  assertEquals((compileSource(input, global) as NullVal).value, null);
 });
 
 Deno.test('let declaration with assignment', () => {
   const input = 'let x = 2;';
-  assertEquals((compileSource(input, env) as NumberVal).value, 2);
+  assertEquals((compileSource(input, global) as NumberVal).value, 2);
 });
 
 Deno.test('const declaration with assignment', () => {
   const input = 'const MARIGNAN = 1515;';
-  assertEquals((compileSource(input, env) as NumberVal).value, 1515);
+  assertEquals((compileSource(input, global) as NumberVal).value, 1515);
 });
 
 Deno.test('const declaration without assignment', () => {
   const input = 'const bar;';
-  assertThrows(() => compileSource(input, env), Error);
+  assertThrows(() => compileSource(input, global), Error);
 });
 
 Deno.test('const assignment', () => {
@@ -33,11 +33,11 @@ Deno.test('const assignment', () => {
     const y = 2;
     y = 5;
   `;
-  assertThrows(() => compileSource(input, env), Error);
+  assertThrows(() => compileSource(input, global), Error);
 });
 
 Deno.test('let assignment', () => {
-  const env = new Environment();
+  const env = new Environment(global);
   const input = `
     let z = 2;
     z = 5;
@@ -46,7 +46,7 @@ Deno.test('let assignment', () => {
 });
 
 Deno.test('let assignment with another variable', () => {
-  const env = new Environment();
+  const env = new Environment(global);
   const input = `
     let a = 2;
     let b = 3;

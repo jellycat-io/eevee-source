@@ -1,9 +1,9 @@
 import { assertEquals } from 'https://deno.land/std@0.161.0/testing/asserts.ts';
-import Environment from '../src/runtime/environment.ts';
+import { createGlobalEnv } from '../src/runtime/environment.ts';
 import { BooleanVal, NumberVal } from '../src/runtime/values.ts';
 import { compileSource } from '../util/test-util.ts';
 
-const env = new Environment();
+const env = createGlobalEnv();
 
 Deno.test('number', () => {
   const input = '3';
