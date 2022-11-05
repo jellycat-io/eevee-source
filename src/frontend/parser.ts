@@ -4,8 +4,10 @@ import {
   Expr,
   Identifier,
   NumericLiteral,
+  ObjectLiteral,
   PostfixExpr,
   Program,
+  Property,
   Stmt,
   VarDeclaration,
 } from './ast.ts';
@@ -89,7 +91,7 @@ export class Parser {
   }
 
   private parse_assignment_expr(): Expr {
-    const expr = this.parse_term_expr();
+    const expr = this.parse_object_expr();
 
     if (this.match(TokenType.EQUAL)) {
       const value = this.parse_assignment_expr();
@@ -102,6 +104,43 @@ export class Parser {
     }
 
     return expr;
+  }
+
+  private parse_object_expr(): Expr {
+    if (this.match(TokenType.LEFT_BRACKET)) {
+      const properties = new Array<Property>();
+
+      while (this.not_eof() && !this.check(TokenType.RIGHT_BRACKET)) {
+        // { key: val, key: val }
+        const key =
+          this.expect(TokenType.IDENTIFIER, 'Identifier expected.').literal;
+
+        // Allows shorthand key: pair -> key
+        if (this.match(TokenType.COMMA)) {
+          properties.push({ kind: 'Property', key });
+          continue;
+        } else if (this.check(TokenType.RIGHT_BRACKET)) {
+          properties.push({ kind: 'Property', key });
+          continue;
+        }
+
+        this.expect(TokenType.COLUMN, 'Missing \':\' after identifier.');
+        const value = this.parse_expr();
+
+        properties.push({ kind: 'Property', key, value });
+        if (!this.check(TokenType.RIGHT_BRACKET)) {
+          this.expect(TokenType.COMMA, 'Missing \',\' after key: value pair.');
+        }
+      }
+
+      this.expect(
+        TokenType.RIGHT_BRACKET,
+        'Missing \'}\' after object literal.',
+      );
+      return { kind: 'ObjectLiteral', properties } as ObjectLiteral;
+    }
+
+    return this.parse_term_expr();
   }
 
   private parse_term_expr(): Expr {

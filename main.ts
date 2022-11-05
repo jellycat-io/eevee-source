@@ -1,11 +1,11 @@
 import { Parser } from './src/frontend/parser.ts'
-import Environment from './src/runtime/environment.ts'
+import { createGlobalEnv } from './src/runtime/environment.ts'
 import { evaluate } from './src/runtime/interpreter.ts'
 import { greet } from './src/utils/log.ts'
 
 async function run(filename: string) {
   const parser = new Parser()
-  const env = new Environment()
+  const env = createGlobalEnv();
 
   const input = await Deno.readTextFile(filename)
   const program = parser.produceAst(input)
@@ -15,7 +15,7 @@ async function run(filename: string) {
 
 function repl() {
   const parser = new Parser()
-  const env = new Environment()
+  const env = createGlobalEnv();
 
   greet('Eevee Repl v0.1')
 

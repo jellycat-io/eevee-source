@@ -2,10 +2,17 @@ import {
   AssignmentExpr,
   BinaryExpr,
   Identifier,
+  ObjectLiteral,
   PostfixExpr,
 } from '../../frontend/ast.ts';
 import Environment from '../environment.ts';
-import { MK_NULL, MK_NUMBER, NumberVal, RuntimeVal } from '../values.ts';
+import {
+  MK_NULL,
+  MK_NUMBER,
+  NumberVal,
+  ObjectVal,
+  RuntimeVal,
+} from '../values.ts';
 import { evaluate } from '../interpreter.ts';
 import { RuntimeError } from '../../utils/error.ts';
 
@@ -20,6 +27,26 @@ export function eval_assignment_expr(
   }
   const varname = (expr.assignee as Identifier).symbol;
   return env.assignVar(varname, evaluate(expr.value, env));
+}
+
+export function eval_object_expr(
+  obj: ObjectLiteral,
+  env: Environment,
+): RuntimeVal {
+  const object = {
+    type: 'object',
+    properties: new Map<string, RuntimeVal>(),
+  } as ObjectVal;
+
+  for (const { key, value } of obj.properties) {
+    // Handles valid key: pair
+    const runtimeVal = (value == undefined)
+      ? env.lookupVar(key)
+      : evaluate(value, env);
+    object.properties.set(key, runtimeVal);
+  }
+
+  return object;
 }
 
 export function eval_binary_expr(

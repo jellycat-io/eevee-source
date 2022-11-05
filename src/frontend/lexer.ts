@@ -60,7 +60,7 @@ export class Lexer {
       return this.tokens;
     } catch (err) {
       if (err instanceof LexerError) error(err.getErrorMessage());
-      error('Unexpected Lexer Eerror');
+      error('Unexpected Lexer Error');
       Deno.exit(1);
     }
   }
@@ -72,11 +72,32 @@ export class Lexer {
       case ';':
         this.addToken(TokenType.SEMICOLON);
         break;
+      case ':':
+        this.addToken(TokenType.COLUMN);
+        break;
+      case ',':
+        this.addToken(TokenType.COMMA);
+        break;
+      case '.':
+        this.addToken(TokenType.DOT);
+        break;
       case '(':
         this.addToken(TokenType.LEFT_PAREN);
         break;
       case ')':
         this.addToken(TokenType.RIGHT_PAREN);
+        break;
+      case '{':
+        this.addToken(TokenType.LEFT_BRACKET);
+        break;
+      case '}':
+        this.addToken(TokenType.RIGHT_BRACKET);
+        break;
+      case '[':
+        this.addToken(TokenType.LEFT_BRACE);
+        break;
+      case ']':
+        this.addToken(TokenType.RIGHT_BRACE);
         break;
       case '+':
         if (this.match('+')) this.addToken(TokenType.PLUS_PLUS);

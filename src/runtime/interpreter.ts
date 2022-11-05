@@ -4,6 +4,7 @@ import {
   BinaryExpr,
   Identifier,
   NumericLiteral,
+  ObjectLiteral,
   PostfixExpr,
   Program,
   Stmt,
@@ -14,6 +15,7 @@ import {
   eval_assignment_expr,
   eval_binary_expr,
   eval_identifier,
+  eval_object_expr,
   eval_postfix_expr,
 } from './eval/expressions.ts';
 import { eval_program, eval_var_declaration } from './eval/statements.ts';
@@ -32,6 +34,8 @@ export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
       return eval_assignment_expr(astNode as AssignmentExpr, env);
     case 'PostfixExpr':
       return eval_postfix_expr(astNode as PostfixExpr, env);
+    case 'ObjectLiteral':
+      return eval_object_expr(astNode as ObjectLiteral, env);
 
     // STATEMENTS
     case 'Program':
@@ -39,6 +43,6 @@ export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
     case 'VarDeclaration':
       return eval_var_declaration(astNode as VarDeclaration, env);
     default:
-      throw new RuntimeError(`Not implemented yet: ${astNode}`);
+      throw new RuntimeError(`Not implemented yet: ${JSON.stringify(astNode)}`);
   }
 }

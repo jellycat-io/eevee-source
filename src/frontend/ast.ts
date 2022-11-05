@@ -8,15 +8,22 @@ export type NodeType =
   | 'Program'
   | 'VarDeclaration'
   // EXPRESSIONS
-  | 'NumericLiteral'
-  | 'Identifier'
-  | 'StringLiteral'
-  | 'BooleanLiteral'
   | 'AssignmentExpr'
   | 'UnaryExpr'
   | 'PostfixExpr'
   | 'BinaryExpr'
-  | 'FunctionDecl';
+  | 'FunctionDecl'
+  // LITERALS
+  | 'Property'
+  | 'ObjectLiteral'
+  | 'NumericLiteral'
+  | 'Identifier'
+  | 'StringLiteral'
+  | 'BooleanLiteral';
+
+/*
+ * STATEMENTS
+ */
 
 export interface Stmt {
   kind: NodeType;
@@ -33,6 +40,10 @@ export interface VarDeclaration extends Stmt {
   identifier: string;
   value: Expr | null;
 }
+
+/*
+ * EXPRESSIONS
+ */
 
 // deno-lint-ignore no-empty-interface
 export interface Expr extends Stmt {}
@@ -56,6 +67,10 @@ export interface BinaryExpr extends Expr {
   rhs: Expr;
 }
 
+/*
+ * LITERALS
+ */
+
 export interface Identifier extends Expr {
   kind: 'Identifier';
   symbol: string;
@@ -74,4 +89,15 @@ export interface StringLiteral extends Expr {
 export interface BooleanLiteral extends Expr {
   kind: 'BooleanLiteral';
   value: boolean;
+}
+
+export interface Property extends Expr {
+  kind: 'Property';
+  key: string;
+  value?: Expr;
+}
+
+export interface ObjectLiteral extends Expr {
+  kind: 'ObjectLiteral';
+  properties: Array<Property>;
 }

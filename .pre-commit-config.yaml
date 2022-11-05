@@ -4,4 +4,3 @@
     - id: deno-fmt
     - id: deno-fmt-check
     - id: deno-lint
-    - id: deno-test
